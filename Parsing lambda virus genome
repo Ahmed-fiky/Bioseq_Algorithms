@@ -7,5 +7,5 @@ def  readgenome(filename)
                genome += line.rstrip()
      return genome
 genome = readgenome('filename.fa')
-print 'genome'
-
+print("Genome length:", len(genome))
+print("First 100 bases:", genome[:100])
