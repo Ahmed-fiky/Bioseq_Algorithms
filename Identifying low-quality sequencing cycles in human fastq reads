@@ -1,0 +1,47 @@
+# Step 1: Download the FASTQ file
+!wget --no-check-certificate https://d28rh4a8wq0iu5.cloudfront.net/ads1/data/ERR037900_1.first1000.fastq
+
+# Step 2: Parse the FASTQ file
+def readFastq(filename):
+    sequences = []
+    qualities = []
+    with open(filename) as fh:
+        while True:
+            header = fh.readline()
+            seq = fh.readline().rstrip()
+            plus = fh.readline()
+            qual = fh.readline().rstrip()
+            if len(seq) == 0:  # end of file
+                break
+            sequences.append(seq)
+            qualities.append(qual)
+    return sequences, qualities
+
+seqs, quals = readFastq('ERR037900_1.first1000.fastq')
+print("Number of reads:", len(seqs))
+print("Length of first read:", len(seqs[0]))
+
+# Step 3: Convert quality strings to numeric Phred scores (Phred+33)
+def phred33_to_q(qual_str):
+    return [ord(c) - 33 for c in qual_str]
+
+quals_numeric = [phred33_to_q(q) for q in quals]
+
+# Step 4: Analyze quality per cycle
+import numpy as np
+
+quals_array = np.array(quals_numeric)  # shape: (num_reads, read_length)
+mean_per_cycle = quals_array.mean(axis=0)  # average quality at each position
+
+# Step 5: Identify the bad cycle
+bad_cycle = mean_per_cycle.argmin()
+print("Sequencing cycle with poor quality (0-based):", bad_cycle)
+
+# Optional: visualize per-cycle quality
+import matplotlib.pyplot as plt
+
+plt.plot(mean_per_cycle)
+plt.xlabel("Cycle (0-based)")
+plt.ylabel("Average Phred quality")
+plt.title("Average quality per sequencing cycle")
+plt.show()
