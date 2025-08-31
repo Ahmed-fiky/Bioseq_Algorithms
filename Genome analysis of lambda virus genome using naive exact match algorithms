@@ -1,0 +1,68 @@
+###naive exact matching algorithm
+def  naive(p, t):
+   occurences = [ ]
+   for i in  range(len(t) - len(p) + 1):      # y-x+1   --- loop over alignments
+       match = True
+       for j in range (len(p)):       # from y-x+1 to x(y-x+1) --- loop over characters
+                    if t[i+j]  != p[j]:       #t[i+j] ---character in t at position i + j ,
+                                                       # p[j] → corresponding character in p 
+                           match = False
+                             break
+            if match:
+                  occurences.append(i)
+        return occurences
+p = " "
+t = genome
+matches = naive(p, t)
+print(matches)
+
+
+###naive exact matching with reverse compartment and without duplicates
+  def naive_with_rc(p, t):
+   
+    # reverse complement
+    complement = {'A':'T', 'T':'A', 'C':'G', 'G':'C', 'N':'N'}
+    rc_p = ''.join(complement[base] for base in reversed(p))
+   
+    occurrences = []
+   
+    for pattern in {p, rc_p}:   # set avoids duplicates if p == rc_p
+        for i in range(len(t) - len(pattern) + 1):  # loop over alignments
+            match = True
+            for j in range(len(pattern)):  # loop over characters
+                if t[i+j] != pattern[j]:  # compare characters
+                    match = False
+                    break
+            if match:
+                occurrences.append(i)  
+   
+    return sorted(occurrences)
+
+p = " "
+t = genome
+matches = naive_with_rc(p, t)
+print("Total occurrences:", len(matches))
+print(matches)
+
+###in the next algorithm we will try to use the naive algo with 2 allowed mismatches
+
+def naive_2mm(p, t, max_mismatches=2):
+   
+    occurrences = []
+    for i in range(len(t) - len(p) + 1):  
+        mismatches = 0
+        for j in range(len(p)):
+            if t[i+j] != p[j]:
+                mismatches += 1
+                if mismatches > max_mismatches:
+                    break  # too many mismatches, stop checking this alignment
+        if mismatches <= max_mismatches:
+            occurrences.append(i)
+    return occurrences
+
+genome = readGenome('lambda_virus.fa')
+
+matches = naive_2mm("TTCAAGCC", genome)
+
+print("Total occurrences:", len(matches))
+print(matches)
