@@ -1,0 +1,11 @@
+!wget --no-check  https://d28rh4a8wq0iu5.cloudfront.net/ads1/data/lambda_virus.fa
+def  readgenome(filename)
+        genome = ' '
+        with open(filename,  'r') as f:
+        for line in f:
+             if not line [0] == '>':
+               genome += line.rstrip()
+     return genome
+genome = readgenome('filename.fa')
+print 'genome'
+
